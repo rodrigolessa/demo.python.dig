@@ -1,0 +1,61 @@
+Definição De Estrutura De Diretórios De Projetos Python
+Posted on 12 \d\e novembro \d\e 2009. Filed under: computers, irc, python |
+
+Uma dúvida que sempre surge é como definir a estrutura de pastas para um novo projeto. Eu sempre sigo estas dicas que vou passar agora, pois elas permitem uma grande facilidade de instalar, testar e distribuir o código, e assegura que ele se comportará corretamente em todas as plataformas.
+
+Crie uma pasta para seu projeto. Por exemplo, se seu projeto se chama NetoChat, crie uma pasta NetoChat para ser a raiz do seu projeto. Quando você lançar uma versão, inclua um sufixo de versão: NetoChat-2.5
+
+Crie dentro desta pasta um pacote python para conter o fonte do seu projeto. Dê a ela um nome sem traços e sem espaços, somente com letras minúsculas. Exemplo: NetoChat/netochat. Crie um arquivo __init__.py vazio dentro desta pasta para que ela seja considerada um pacote. NetoChat/netochat/__init__.py
+
+Coloque seus módulos lá dentro do pacote: NetoChat/netochat/interface.py NetoChat/netochat/rede.py
+
+Você também pode organizar em subpacotes. Primeiro crie NetoChat/netochat/eventos/__init__.py para criar um pacote eventos. Em seguida crie seus módulos lá dentro, por exemplo, NetoChat/netochat/eventos/som.py Fazendo desta forma, estes módulos podem ser chamados facilmente de forma absoluta, sem ambiguidades nem confusões. Exemplos:
+
+from netochat.eventos import som
+
+from netochat import rede
+
+Crie uma pasta NetoChat/bin onde você colocará seus executáveis. Estes executáveis devem ser scripts python sem a extensão .py, que possuem somente uma linha importando e executando uma função que deve estar definida em outro ponto do projeto. Não coloque o código em si nestes scripts, apenas a chamada. Exemplo, NetoChat/bin/nchat:
+
+from netochat.interface import main_window ; main_window()
+
+Ponha seus testes de unidade em um outro pacote python. Mais uma vez, isto implica em criar o pacote (NetoChat/tests/__init__.py)  e colocar seus testes lá (NetoChat/tests/test_rede.py, NetoChat/tests/test_interface.py)
+
+Adicione alguns arquivos que é sempre bom ter:
+
+NetoChat/setup.py – programa de instalação criado com distutils para instalar seu programa e registrá-lo automaticamente;
+
+NetoChat/README – descrição do seu programa;
+
+NetoChat/LICENSE – licença de distribuição do seu código;
+
+NetoChat/TODO, NetoChat/INSTALL, etc
+
+A estrutura do código ficaria assim:
+
+NetoChat/
+	setup.py
+	README
+	bin/
+		nchat
+	netochat/
+		__init__.py
+		interface.py
+		rede.py
+		eventos
+			__init__.py
+			som.py
+		tests/
+			__init__.py
+			test_interface.py
+			test_rede.py
+
+Por favor, não faça, repito, não faça as coisas abaixo:
+
+NÃO coloque seu código fonte em uma pasta chamada lib ou src – dificulta a execução do seu código sem instalá-lo.
+
+NÃO ponha seus testes fora do pacote python principal do seu projeto – dificulta a execução dos testes em uma versão instalada do código
+
+NÃO crie um pacote com apenas um __init__.py e ponha o código todo em __init__.py. Simplesmente crie um módulo comum ao invés de um pacote. É mais simples.
+
+NÃO tente criar gambiarras e usar magia negra para fazer seu módulo ser importável sem que o usuário tenha que adicioná-lo ao caminho de importação dele (através de PYTHONPATH, setup.py ou qualquer outro mecanismo). Você com certeza vai deixar algo faltando e seu programa não vai rodar em alguma plataforma ou caso específico se você tentar assim. Simplesmente crie o setup.py usando distutils e ele fará a coisa certa automaticamente.
