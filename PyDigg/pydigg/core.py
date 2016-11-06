@@ -4,8 +4,9 @@ path = "D:\Projetos\demo.knockout.asp"
 
 extension = ".asp"
 
-nodeData = list()
-linkData = list()
+entityRelationData = list()
+nodesData = list()
+linksData = list()
 
 #dirList = os.listdir(path)
 
@@ -25,6 +26,7 @@ for root, dirs, files in os.walk(path):
 				for line in lines:
 					typeRelation = ">"
 					if line:
+						line = line.strip()
 						toNameFile = ""
 						extPosition = line.find(extension)
 						if extPosition > 0:
@@ -39,30 +41,36 @@ for root, dirs, files in os.walk(path):
 								typeRelation = "link"
 								toNameFile = line[linkPosition + 4:extPosition + 4]
 							toNameFile = toNameFile.replace("\"", "")
-							if toNameFile.find("/") > 0:
-								toNameFile = toNameFile[toNameFile.find("/") + 1:]
-							linkData.append(
+							toNameFile = toNameFile.replace("=", "")
+							if toNameFile.rfind("/") > 0:
+								toNameFile = toNameFile[toNameFile.rfind("/") + 1:]
+							linksData.append(
 								{ 'from' : file, 'to' : toNameFile, 'text' : typeRelation, 'toText' : ">" }
 							)
-						if line.startswith("function ") > 0:
+						if line.lower().startswith("function ") > 0:
 							dataItems.append(
-								{'name': 'Funcao', 'iskey': False, 'figure': "Decision", 'color': 'purple'}
+								{'name': line[8:].strip(), 'iskey': False, 'figure': "Decision", 'color': 'purple'}
 							)
-						if line.startswith("sub ") > 0:
+						if line.lower().startswith("sub ") > 0:
 							dataItems.append(
-								{'name': 'Call', 'iskey': False, 'figure': "Decision", 'color': 'purple'}
+								{'name': line[3:].strip(), 'iskey': False, 'figure': "Decision", 'color': 'purple'}
 							)
-				nodeData.append(
+				nodesData.append(
 					{
-						'key' : file,
-					  	'items' : dataItems
+						'key': file,
+						'title': file,
+						'items': dataItems
 					}
 				)
 			#print(" ")
 
-# Writing JSON data in a physical file
-with open('data.json', 'w') as f:
-	json.dump(nodeData, f)
+entityRelationData.append(
+	{
+		'nodes': nodesData,
+		'links': linksData
+	}
+)
 
-with open('link.json', 'w') as g:
-	json.dump(linkData, g)
+# Writing JSON data in a physical file
+with open('entityRelationData.json', 'w') as f:
+	json.dump(entityRelationData, f)
