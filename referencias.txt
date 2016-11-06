@@ -1,0 +1,11 @@
+https://github.com/auchenberg/dependo
+http://bl.ocks.org/mbostock/1153292
+http://resources.jointjs.com/docs/jointjs/v1.0/joint.html
+
+file:///D:/Projetos/Forks/GoJS-master/GoJS-master/samples/entityRelationship.html
+https://github.com/rodrigolessa/GoJS
+
+http://todomvc.com/examples/react/#/
+http://todomvc.com/examples/angularjs/#/
+http://todomvc.com/examples/firebase-angular/#/
+http://www.devmedia.com.br/busca/?keyword=210683

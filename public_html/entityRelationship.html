@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Entity Relationship</title>
+<meta name="description" content="Interactive entity-relationship diagram or data model diagram implemented by GoJS in JavaScript for HTML." />
+<!-- Copyright 1998-2016 by Northwoods Software Corporation. -->
+<meta charset="UTF-8">
+<script src="js/go.js"></script>
+<!--link href="css/goSamples.css" rel="stylesheet" type="text/css" />  <!-- you don't need to use this -->
+<!--script src="js/goSamples.js"></script>  <!-- this is only for the GoJS Samples framework -->
+<script id="code">
+  function init() {
+    
+    //if (window.goSamples) goSamples();  // init for these samples -- you don't need to call this
+    
+    var $ = go.GraphObject.make;  // for conciseness in defining templates
+
+    myDiagram =
+      $(go.Diagram, "myDiagramDiv",  // must name or refer to the DIV HTML element
+        {
+          initialContentAlignment: go.Spot.Center,
+          allowDelete: false,
+          allowCopy: false,
+          layout: $(go.ForceDirectedLayout),
+          "undoManager.isEnabled": true
+        });
+
+    // define several shared Brushes
+    var bluegrad = $(go.Brush, "Linear", { 0: "rgb(150, 150, 250)", 0.5: "rgb(86, 86, 186)", 1: "rgb(86, 86, 186)" });
+    var greengrad = $(go.Brush, "Linear", { 0: "rgb(158, 209, 159)", 1: "rgb(67, 101, 56)" });
+    var redgrad = $(go.Brush, "Linear", { 0: "rgb(206, 106, 100)", 1: "rgb(180, 56, 50)" });
+    var yellowgrad = $(go.Brush, "Linear", { 0: "rgb(254, 221, 50)", 1: "rgb(254, 182, 50)" });
+    var lightgrad = $(go.Brush, "Linear", { 1: "#E6E6FA", 0: "#FFFAF0" });
+
+    // the template for each attribute in a node's array of item data
+    var itemTempl =
+      $(go.Panel, "Horizontal",
+        $(go.Shape,
+          { desiredSize: new go.Size(10, 10) },
+          new go.Binding("figure", "figure"),
+          new go.Binding("fill", "color")),
+        $(go.TextBlock,
+          { stroke: "#333333",
+            font: "bold 14px sans-serif" },
+          new go.Binding("text", "name"))
+      );
+
+    // define the Node template, representing an entity
+    myDiagram.nodeTemplate =
+      $(go.Node, "Auto",  // the whole node panel
+        { selectionAdorned: true,
+          resizable: true,
+          layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized,
+          fromSpot: go.Spot.AllSides,
+          toSpot: go.Spot.AllSides,
+          isShadowed: false,
+          shadowColor: "#404040" },
+        new go.Binding("location", "location").makeTwoWay(),
+        // define the node's outer shape, which will surround the Table
+        $(go.Shape, "Rectangle",
+          { fill: lightgrad, stroke: "#404040", strokeWidth: 5 }),
+        $(go.Panel, "Table",
+          { margin: 10, stretch: go.GraphObject.Fill },
+          $(go.RowColumnDefinition, { row: 0, sizing: go.RowColumnDefinition.None }),
+          // the table header
+          $(go.TextBlock,
+            {
+              row: 0, alignment: go.Spot.Center,
+              margin: new go.Margin(0, 2, 0, 2),  // leave room for Button
+              font: "bold 16px sans-serif"
+            },
+            new go.Binding("text", "key")),
+          // the collapse/expand button
+          $("PanelExpanderButton", "LIST",  // the name of the element whose visibility this button toggles
+            { row: 0, alignment: go.Spot.TopRight }),
+          // the list of Panels, each showing an attribute
+          $(go.Panel, "Vertical",
+            {
+              name: "LIST",
+              row: 1,
+              padding: 5,
+              alignment: go.Spot.TopLeft,
+              defaultAlignment: go.Spot.Left,
+              stretch: go.GraphObject.Horizontal,
+              itemTemplate: itemTempl
+            },
+            new go.Binding("itemArray", "items"))
+        )  // end Table Panel
+      );  // end Node
+
+    // define the Link template, representing a relationship
+    myDiagram.linkTemplate =
+      $(go.Link,  // the whole link panel
+        {
+          selectionAdorned: true,
+          layerName: "Foreground",
+          reshapable: true,
+          routing: go.Link.AvoidsNodes,
+          corner: 5,
+          curve: go.Link.JumpOver
+        },
+        $(go.Shape,  // the link shape
+          { stroke: "#303B45", strokeWidth: 2.5 }),
+        $(go.TextBlock,  // the "from" label
+          {
+            textAlign: "center",
+            font: "bold 14px sans-serif",
+            stroke: "#1967B3",
+            segmentIndex: 0,
+            segmentOffset: new go.Point(NaN, NaN),
+            segmentOrientation: go.Link.OrientUpright
+          },
+          new go.Binding("text", "text")),
+        $(go.TextBlock,  // the "to" label
+          {
+            textAlign: "center",
+            font: "bold 14px sans-serif",
+            stroke: "#1967B3",
+            segmentIndex: -2,
+            segmentOffset: new go.Point(NaN, NaN),
+            segmentOrientation: go.Link.OrientUpright
+          },
+          new go.Binding("text", "toText"))
+      );
+
+
+
+
+    // create the model for the E-R diagram
+    var nodeDataArray = [{"key": "Index.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "ListarTarefas.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "ListarUsuario.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "ManterUsuario.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "BancoDeDados.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "EntityUtil.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "SQLUtil.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "ValidationUtil.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "fnComparaData.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "fnConverteDataSQL.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "fnExecuteScalar.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}, {"figure": "Decision", "color": "purple", "iskey": false, "name": "Funcao"}]}, {"key": "fnValidaDataHora.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}, {"figure": "Decision", "color": "purple", "iskey": false, "name": "Funcao"}]}, {"key": "UsuarioDTO.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "PontoRepository.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "TipoUsuarioRepository.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "UsuarioRepository.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "Cabecalho.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "Rodape.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}, {"key": "ScriptsComuns.asp", "items": [{"figure": "Decision", "color": "purple", "iskey": true, "name": "Id"}]}];
+
+    var linkDataArray = [{"to": "Cabecalho.asp", "text": "include", "from": "Index.asp", "toText": ">"}, {"to": "ScriptsComuns.asp", "text": "include", "from": "Index.asp", "toText": ">"}, {"to": "Rodape.asp", "text": "include", "from": "Index.asp", "toText": ">"}, {"to": "Cabecalho.asp", "text": "include", "from": "ListarTarefas.asp", "toText": ">"}, {"to": "ScriptsComuns.asp", "text": "include", "from": "ListarTarefas.asp", "toText": ">"}, {"to": "Rodape.asp", "text": "include", "from": "ListarTarefas.asp", "toText": ">"}, {"to": "Cabecalho.asp", "text": "include", "from": "ListarUsuario.asp", "toText": ">"}, {"to": "ScriptsComuns.asp", "text": "include", "from": "ListarUsuario.asp", "toText": ">"}, {"to": "Rodape.asp", "text": "include", "from": "ListarUsuario.asp", "toText": ">"}, {"to": "Cabecalho.asp", "text": "include", "from": "ManterUsuario.asp", "toText": ">"}, {"to": "ScriptsComuns.asp", "text": "include", "from": "ManterUsuario.asp", "toText": ">"}, {"to": "Rodape.asp", "text": "include", "from": "ManterUsuario.asp", "toText": ">"}, {"to": "fnConverteDataSQL.asp", "text": "include", "from": "SQLUtil.asp", "toText": ">"}, {"to": "Kadastro.Arquitetura/BancoDeDados.asp", "text": "include", "from": "PontoRepository.asp", "toText": ">"}, {"to": "Kadastro.Comuns/SQLUtil.asp", "text": "include", "from": "PontoRepository.asp", "toText": ">"}, {"to": "=Index.asp", "text": "link", "from": "Cabecalho.asp", "toText": ">"}, {"to": "=ListarUsuario.asp", "text": "link", "from": "Cabecalho.asp", "toText": ">"}, {"to": "=ManterUsuario.asp", "text": "link", "from": "Cabecalho.asp", "toText": ">"}, {"to": "=ListarTarefas.asp", "text": "link", "from": "Cabecalho.asp", "toText": ">"}];
+
+    myDiagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+  }
+</script>
+</head>
+<body onload="init()" bgcolor="#404040">
+<div id="sample">
+  <div id="myDiagramDiv" style="background-color: #000000; border: solid 1px #404040; width: 100%; height: 900px;"></div>
+</div>
+</body>
+</html>
